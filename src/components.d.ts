@@ -10,70 +10,27 @@ import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 
 
 export namespace Components {
-  interface MxcdSideDrawer {
-    'open': () => Promise<void>;
-    'opened': boolean;
-    'sideTitle': string;
-  }
-  interface MyComponent {
-    /**
-    * The first name
-    */
-    'first': string;
-    /**
-    * The last name
-    */
-    'last': string;
-    /**
-    * The middle name
-    */
-    'middle': string;
-  }
+  interface MxcdStockPrice {}
 }
 
 declare global {
 
 
-  interface HTMLMxcdSideDrawerElement extends Components.MxcdSideDrawer, HTMLStencilElement {}
-  var HTMLMxcdSideDrawerElement: {
-    prototype: HTMLMxcdSideDrawerElement;
-    new (): HTMLMxcdSideDrawerElement;
-  };
-
-  interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {}
-  var HTMLMyComponentElement: {
-    prototype: HTMLMyComponentElement;
-    new (): HTMLMyComponentElement;
+  interface HTMLMxcdStockPriceElement extends Components.MxcdStockPrice, HTMLStencilElement {}
+  var HTMLMxcdStockPriceElement: {
+    prototype: HTMLMxcdStockPriceElement;
+    new (): HTMLMxcdStockPriceElement;
   };
   interface HTMLElementTagNameMap {
-    'mxcd-side-drawer': HTMLMxcdSideDrawerElement;
-    'my-component': HTMLMyComponentElement;
+    'mxcd-stock-price': HTMLMxcdStockPriceElement;
   }
 }
 
 declare namespace LocalJSX {
-  interface MxcdSideDrawer {
-    'opened'?: boolean;
-    'sideTitle'?: string;
-  }
-  interface MyComponent {
-    /**
-    * The first name
-    */
-    'first'?: string;
-    /**
-    * The last name
-    */
-    'last'?: string;
-    /**
-    * The middle name
-    */
-    'middle'?: string;
-  }
+  interface MxcdStockPrice {}
 
   interface IntrinsicElements {
-    'mxcd-side-drawer': MxcdSideDrawer;
-    'my-component': MyComponent;
+    'mxcd-stock-price': MxcdStockPrice;
   }
 }
 
@@ -83,8 +40,7 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
   export namespace JSX {
     interface IntrinsicElements {
-      'mxcd-side-drawer': LocalJSX.MxcdSideDrawer & JSXBase.HTMLAttributes<HTMLMxcdSideDrawerElement>;
-      'my-component': LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+      'mxcd-stock-price': LocalJSX.MxcdStockPrice & JSXBase.HTMLAttributes<HTMLMxcdStockPriceElement>;
     }
   }
 }
