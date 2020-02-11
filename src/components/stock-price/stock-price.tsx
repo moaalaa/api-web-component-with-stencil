@@ -1,4 +1,4 @@
-import { Component, Element, h, Host, State } from '@stencil/core';
+import { Component, Element, h, Host, Prop, State, Watch } from '@stencil/core';
 import { AV_API_KEY } from '../../global/global';
 
 @Component({
@@ -14,7 +14,8 @@ export class StockPrice {
 
 	// Reference property to element
 	// Used for method 2: element reference
-	stockInput: HTMLInputElement;
+	private stockInput: HTMLInputElement;
+	private initialStockSymbol: string;
 
 	// Used for method 3: two way binding
 	@State() stockUserInput: string;
@@ -23,8 +24,21 @@ export class StockPrice {
 	
 	@State() price = 0;
 	@State() error: string;
+	
+	
+	@Prop({ reflect: true, mutable: true }) stockSymbol: string;
+
+	// Watch stockSymbol method 2 (best chice)
+	@Watch('stockSymbol')
+	stockSymbolChanged(new_value: string, old_value: string) {
+		if (new_value !== old_value) {
+			this.stockUserInput = new_value; 
+			this.fetchStockPrice(new_value);
+		}
+	}
 
 	// Listen to user input (method 3: two way binding)
+	// Used As Validation Here
 	onUserInput(event: Event) {
 		this.stockUserInput = (event.target as HTMLInputElement).value;
 
@@ -35,10 +49,13 @@ export class StockPrice {
 		}
 	}
 	
-	fetchStockPrice(event: Event) {
+	onFetchStockPrice(event: Event) {
 		event.preventDefault();
 
 		// Get User Input
+		// I Choose to use Method 2 More simple and wat i want 
+		// But Also Using Method 3 as a validation
+
 		// Method 1: Using Old School querySelector
 		// --- Because "el" is type of "HTMLElement" and most "HTMLElement" doesn't have a "value" property
 		// --- TypeScript Will give an error
@@ -51,13 +68,41 @@ export class StockPrice {
 
 		// ------------------------
 		// Method 2: Using Reference
-		// const stockSymbol = this.stockInput.value;
+		this.stockSymbol = this.stockInput.value;
 
 		// ------------------------
 		// Method 3: two Way Binding
-		const stockSymbol = this.stockUserInput;
+		// const stockSymbol = this.stockUserInput;
 
+		// ---------------------------------------------//
+		// Stop Calling API From Here Because We Change The "this.stockSymbol" above so the watcher will fire the API
+		// this.fetchStockPrice(stockSymbol);
+	}
 
+	componentWillLoad() {
+		if (this.stockSymbol) {
+			// this.initialStockSymbol = this.stockSymbol;
+			this.stockUserInput = this.stockSymbol;
+			this.stockValidInput = true;
+		}
+	}
+
+	componentDidLoad() {
+		if (this.stockSymbol) {
+			this.fetchStockPrice(this.stockSymbol);
+		}
+	}
+
+	componentDidUpdate() {
+		// Watching this.stockSymbol method 1 
+		// if (this.stockSymbol !== this.initialStockSymbol) {
+		// 	this.initialStockSymbol = this.stockSymbol;
+		// 	this.stockUserInput = this.stockSymbol;
+		// 	this.fetchStockPrice(this.stockSymbol);
+		// }
+	}
+
+	private fetchStockPrice(stockSymbol: string) {
 		fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${stockSymbol}&apikey=${AV_API_KEY}`)
 			.then(result => result.json())
 			.then(data => {
@@ -73,24 +118,25 @@ export class StockPrice {
 				// Source: https://scotch.io/tutorials/javascript-unary-operators-simple-and-useful
 				this.price = +data['Global Quote']['05. price'];
 			})
-			.catch((err: Error) => this.error = err.message)
-		
+			.catch((err: Error) => this.error = err.message);
 	}
 
 	render() {
 		let dataContent = <p>Please Enter A Symbol</p>;
 
-		if (this.error) {
-			dataContent = <p style={{color: 'red'}}>{this.error}</p>;
-		}
-		
 		if (this.price) {
 			dataContent = <p>Price: ${this.price}</p>;
+		}
+		
+		if (this.error) {
+			console.log(this.error);
+			
+			dataContent = <p style={{color: 'red'}}>{this.error}</p>;
 		}
 
 		return (
 			<Host>
-				<form onSubmit={this.fetchStockPrice.bind(this)}>
+				<form onSubmit={this.onFetchStockPrice.bind(this)}>
 					<input 
 						type="text" 
 						id="stock-input" 
