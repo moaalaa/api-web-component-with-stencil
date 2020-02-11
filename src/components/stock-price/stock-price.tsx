@@ -20,7 +20,9 @@ export class StockPrice {
 	@State() stockUserInput: string;
 	@State() stockValidInput = false;
 
+	
 	@State() price = 0;
+	@State() error: string;
 
 	// Listen to user input (method 3: two way binding)
 	onUserInput(event: Event) {
@@ -59,21 +61,33 @@ export class StockPrice {
 		fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${stockSymbol}&apikey=${AV_API_KEY}`)
 			.then(result => result.json())
 			.then(data => {
-				console.log(data['Global Quote']['05. price']);
 				
-				console.log(parseFloat(data['Global Quote']['05. price']));
-				console.log(+data['Global Quote']['05. price']);
+				if (! data.hasOwnProperty('Global Quote')) {
+					throw new Error('Invalid Symbol idiot :)');
+				}
+
+				this.error = null;
 				
 				// Unary Operator "+" convert operand to number
 				// Unary operators are more efficient than standard JavaScript function calls
 				// Source: https://scotch.io/tutorials/javascript-unary-operators-simple-and-useful
 				this.price = +data['Global Quote']['05. price'];
 			})
-			.catch(err => console.error(err))
+			.catch((err: Error) => this.error = err.message)
 		
 	}
 
 	render() {
+		let dataContent = <p>Please Enter A Symbol</p>;
+
+		if (this.error) {
+			dataContent = <p style={{color: 'red'}}>{this.error}</p>;
+		}
+		
+		if (this.price) {
+			dataContent = <p>Price: ${this.price}</p>;
+		}
+
 		return (
 			<Host>
 				<form onSubmit={this.fetchStockPrice.bind(this)}>
@@ -89,9 +103,7 @@ export class StockPrice {
 					/>
 					<button type="submit" disabled={!this.stockValidInput}>Fetch Price</button>
 				</form>
-				<div>
-					<p>Price: ${this.price}</p>
-				</div>
+				<div> {dataContent} </div>
       		</Host>
 		)
 	}
