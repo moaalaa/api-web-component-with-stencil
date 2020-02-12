@@ -1,9 +1,10 @@
 :host {
+  box-sizing: border-box;
   --main-color: #34495e;
-
+  text-align: center;
   font-family: sans-serif;
   display: block; /* Custom Elements By default are inline styled so we make it block for margin and padding */
-  width: 20rem;
+  width: 30rem;
   max-width: 100%;
   margin: 2rem;
   padding: 1rem;
@@ -12,10 +13,20 @@
   background-color: white;
 }
 
+:host(.error) {
+  border:2px solid #e93a3a;
+}
+
+form {
+  display: flex;
+  align-items: center;
+}
+
 form input {
   font: inherit;
   color: var(--main-color);
   padding: .1rem .25rem;
+  width: 70%;
 }
 
 form input:focus,
@@ -31,6 +42,7 @@ form button {
   background-color: var(--main-color);
   color: #fff;
   cursor: pointer;
+  width: 30%;
 }
 
 
@@ -44,4 +56,33 @@ form button:disabled {
   border: 1px solid #647383;
   background-color: #647383;
   cursor: not-allowed;
+}
+
+
+/* Spinner */
+/* Source: https://loading.io/css/ */
+.lds-dual-ring {
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+}
+.lds-dual-ring:after {
+  content: " ";
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border-radius: 50%;
+  border: 6px solid var(--main-color);
+  border-color: var(--main-color) transparent var(--main-color) transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+}
+
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

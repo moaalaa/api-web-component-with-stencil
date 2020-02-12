@@ -24,6 +24,7 @@ export class StockPrice {
 	
 	@State() price = 0;
 	@State() error: string;
+	@State() loading = false;
 	
 	
 	@Prop({ reflect: true, mutable: true }) stockSymbol: string;
@@ -124,10 +125,10 @@ export class StockPrice {
 	}
 
 	private fetchStockPrice(stockSymbol: string) {
+		this.loading = true;
 		fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${stockSymbol}&apikey=${AV_API_KEY}`)
 			.then(result => result.json())
-			.then(data => {
-				
+			.then(data => {				
 				if (! data.hasOwnProperty('Global Quote')) {
 					throw new Error('Invalid Symbol idiot :)');
 				}
@@ -138,10 +139,13 @@ export class StockPrice {
 				// Unary operators are more efficient than standard JavaScript function calls
 				// Source: https://scotch.io/tutorials/javascript-unary-operators-simple-and-useful
 				this.price = +data['Global Quote']['05. price'];
+
+				this.loading = false;
 			})
 			.catch((err: Error) => {
 				this.error = err.message;
 				this.price = null;
+				this.loading = false;
 			});
 	}
 
@@ -153,13 +157,16 @@ export class StockPrice {
 		}
 		
 		if (this.error) {
-			console.log(this.error);
-			
 			dataContent = <p style={{color: 'red'}}>{this.error}</p>;
+		}
+		
+		if (this.loading) {
+			// Source: https://loading.io/css/
+			dataContent = <div class="lds-dual-ring"></div>;
 		}
 
 		return (
-			<Host>
+			<Host class={{error: !! this.error}}>
 				<form onSubmit={this.onFetchStockPrice.bind(this)}>
 					<input 
 						type="text" 
@@ -171,7 +178,7 @@ export class StockPrice {
 						onInput={this.onUserInput.bind(this)}
 						autoFocus
 					/>
-					<button type="submit" disabled={!this.stockValidInput}>Fetch Price</button>
+					<button type="submit" disabled={!this.stockValidInput || this.loading}>Fetch Price</button>
 				</form>
 				<div> {dataContent} </div>
       		</Host>
