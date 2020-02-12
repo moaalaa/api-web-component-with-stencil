@@ -1,4 +1,4 @@
-import { Component, h, Host, State } from '@stencil/core';
+import { Component, Event, EventEmitter, h, Host, State } from '@stencil/core';
 import { AV_API_KEY } from '../../global/global';
 
 
@@ -18,7 +18,13 @@ export class StockFinder {
 
 	@State() stocks: Stock[] = [];
 
-	findStocks(event: Event) {
+	// Good Practice to be Define a UniqueEvent Names
+	// Maybe some other components emit same event name.
+	// "EventEmitter" is a generic type Event so we can define our extra information with the type definitions
+	// and we can do this by using "<data here, and here>"
+	@Event({bubbles: true, composed: true}) mxcdSymbolSelected: EventEmitter<string>;
+
+	private findStocks(event: Event) {
 		event.preventDefault();
 
 		const stockName = this.stockNameInput.value;
@@ -31,6 +37,10 @@ export class StockFinder {
 				});
 			})
 			.catch(err => console.error(err));
+	}
+
+	onSelectSymbol(symbol: string) {
+		this.mxcdSymbolSelected.emit(symbol);
 	}
 
 	render() {
@@ -54,7 +64,11 @@ export class StockFinder {
 					<button type="submit">Fetch Stock</button>
 				</form>
 				<ul>
-					{this.stocks.map((stock: Stock) => <li><strong>{stock.symbol}</strong> - {stock.name}</li>)}
+					{this.stocks.map((stock: Stock) => {
+						return <li onClick={this.onSelectSymbol.bind(this, stock.symbol)}>
+									<strong>{stock.symbol}</strong> - {stock.name}
+								</li>
+					})}
 				</ul>
 
 			</Host>

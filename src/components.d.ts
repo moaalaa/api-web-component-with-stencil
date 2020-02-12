@@ -37,7 +37,9 @@ declare global {
 }
 
 declare namespace LocalJSX {
-  interface MxcdStockFinder {}
+  interface MxcdStockFinder {
+    'onMxcdSymbolSelected'?: (event: CustomEvent<string>) => void;
+  }
   interface MxcdStockPrice {
     'stockSymbol'?: string;
   }

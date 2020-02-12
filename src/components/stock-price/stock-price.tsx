@@ -1,4 +1,4 @@
-import { Component, Element, h, Host, Prop, State, Watch } from '@stencil/core';
+import { Component, Element, h, Host, Listen, Prop, State, Watch } from '@stencil/core';
 import { AV_API_KEY } from '../../global/global';
 
 @Component({
@@ -15,7 +15,7 @@ export class StockPrice {
 	// Reference property to element
 	// Used for method 2: element reference
 	private stockInput: HTMLInputElement;
-	private initialStockSymbol: string;
+	// private initialStockSymbol: string;
 
 	// Used for method 3: two way binding
 	@State() stockUserInput: string;
@@ -28,11 +28,12 @@ export class StockPrice {
 	
 	@Prop({ reflect: true, mutable: true }) stockSymbol: string;
 
-	// Watch stockSymbol method 2 (best chice)
+	// Watch stockSymbol method 2 (best choice)
 	@Watch('stockSymbol')
 	stockSymbolChanged(new_value: string, old_value: string) {
 		if (new_value !== old_value) {
 			this.stockUserInput = new_value; 
+			this.stockValidInput = true;
 			this.fetchStockPrice(new_value);
 		}
 	}
@@ -49,6 +50,7 @@ export class StockPrice {
 		}
 	}
 	
+	// used for documenting more than logic
 	onFetchStockPrice(event: Event) {
 		event.preventDefault();
 
@@ -102,6 +104,25 @@ export class StockPrice {
 		// }
 	}
 
+	// We Must target an element to listen to the other component element because 
+	// "mxcdSymbolSelected" event is emitted from a siblings component not from an child component
+	// "@Listen" Decorator Search on event inside it's elements not siblings
+	// So We Need to till "@Listen" Decorator to listen on "mxcdSymbolSelected" by targeting "central element"
+	// "Central ELement" here is body, and that because 
+	// the "mxcdSymbolSelected" event will "Bubble up" from it's Host Element away to the body 
+	// and then will "capture down" from the parent|body|html element to the Host Element Again
+	// The Next Line is the old way to listen to an event on the body
+	// -> @Listen('body:mxcdSymbolSelected')
+
+	// New Way from Official Docs Listen to an event and target the body
+	@Listen('mxcdSymbolSelected', {target: 'body'})
+	onStockSymbolSelected(event: CustomEvent) {
+		if (event.detail && event.detail !== this.stockSymbol) {
+			// Watcher will work and run the fetch (Watcher very useful here)
+			this.stockSymbol = event.detail;
+		}
+	}
+
 	private fetchStockPrice(stockSymbol: string) {
 		fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${stockSymbol}&apikey=${AV_API_KEY}`)
 			.then(result => result.json())
@@ -118,7 +139,10 @@ export class StockPrice {
 				// Source: https://scotch.io/tutorials/javascript-unary-operators-simple-and-useful
 				this.price = +data['Global Quote']['05. price'];
 			})
-			.catch((err: Error) => this.error = err.message);
+			.catch((err: Error) => {
+				this.error = err.message;
+				this.price = null;
+			});
 	}
 
 	render() {

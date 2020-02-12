@@ -57,4 +57,11 @@ li {
   padding: .3rem;
   color: var(--main-color);
   border-bottom: 1px solid var(--main-color);
+  cursor: pointer;
+}
+
+li:hover,
+li:active {
+  background-color: var(--main-color);
+  color: #fff;
 }
