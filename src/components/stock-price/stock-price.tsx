@@ -85,6 +85,9 @@ export class StockPrice {
 	componentWillLoad() {
 		if (this.stockSymbol) {
 			// this.initialStockSymbol = this.stockSymbol;
+			// when "componentDidLoad" run it run "fetchStockPrice" and the loading start
+			// But this cause re-render so Start Loading Here Not in componentDidLoad because the re-render
+			this.loading = true;
 			this.stockUserInput = this.stockSymbol;
 			this.stockValidInput = true;
 		}
@@ -125,7 +128,7 @@ export class StockPrice {
 	}
 
 	private fetchStockPrice(stockSymbol: string) {
-		this.loading = true;
+		
 		fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${stockSymbol}&apikey=${AV_API_KEY}`)
 			.then(result => result.json())
 			.then(data => {				
@@ -161,8 +164,7 @@ export class StockPrice {
 		}
 		
 		if (this.loading) {
-			// Source: https://loading.io/css/
-			dataContent = <div class="lds-dual-ring"></div>;
+			dataContent = <mxcd-spinner></mxcd-spinner>;
 		}
 
 		return (

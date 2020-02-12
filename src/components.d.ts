@@ -10,6 +10,7 @@ import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 
 
 export namespace Components {
+  interface MxcdSpinner {}
   interface MxcdStockFinder {}
   interface MxcdStockPrice {
     'stockSymbol': string;
@@ -18,6 +19,12 @@ export namespace Components {
 
 declare global {
 
+
+  interface HTMLMxcdSpinnerElement extends Components.MxcdSpinner, HTMLStencilElement {}
+  var HTMLMxcdSpinnerElement: {
+    prototype: HTMLMxcdSpinnerElement;
+    new (): HTMLMxcdSpinnerElement;
+  };
 
   interface HTMLMxcdStockFinderElement extends Components.MxcdStockFinder, HTMLStencilElement {}
   var HTMLMxcdStockFinderElement: {
@@ -31,12 +38,14 @@ declare global {
     new (): HTMLMxcdStockPriceElement;
   };
   interface HTMLElementTagNameMap {
+    'mxcd-spinner': HTMLMxcdSpinnerElement;
     'mxcd-stock-finder': HTMLMxcdStockFinderElement;
     'mxcd-stock-price': HTMLMxcdStockPriceElement;
   }
 }
 
 declare namespace LocalJSX {
+  interface MxcdSpinner {}
   interface MxcdStockFinder {
     'onMxcdSymbolSelected'?: (event: CustomEvent<string>) => void;
   }
@@ -45,6 +54,7 @@ declare namespace LocalJSX {
   }
 
   interface IntrinsicElements {
+    'mxcd-spinner': MxcdSpinner;
     'mxcd-stock-finder': MxcdStockFinder;
     'mxcd-stock-price': MxcdStockPrice;
   }
@@ -56,6 +66,7 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
   export namespace JSX {
     interface IntrinsicElements {
+      'mxcd-spinner': LocalJSX.MxcdSpinner & JSXBase.HTMLAttributes<HTMLMxcdSpinnerElement>;
       'mxcd-stock-finder': LocalJSX.MxcdStockFinder & JSXBase.HTMLAttributes<HTMLMxcdStockFinderElement>;
       'mxcd-stock-price': LocalJSX.MxcdStockPrice & JSXBase.HTMLAttributes<HTMLMxcdStockPriceElement>;
     }

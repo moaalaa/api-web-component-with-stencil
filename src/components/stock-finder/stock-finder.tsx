@@ -17,16 +17,17 @@ export class StockFinder {
 
 
 	@State() stocks: Stock[] = [];
+	@State() loading = false;
 
 	// Good Practice to be Define a UniqueEvent Names
 	// Maybe some other components emit same event name.
 	// "EventEmitter" is a generic type Event so we can define our extra information with the type definitions
 	// and we can do this by using "<data here, and here>"
-	@Event({bubbles: true, composed: true}) mxcdSymbolSelected: EventEmitter<string>;
+	@Event({ bubbles: true, composed: true }) mxcdSymbolSelected: EventEmitter<string>;
 
 	private findStocks(event: Event) {
 		event.preventDefault();
-
+		this.loading = true;
 		const stockName = this.stockNameInput.value;
 
 		fetch(`https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=${stockName}&apikey=${AV_API_KEY}`)
@@ -35,16 +36,32 @@ export class StockFinder {
 				this.stocks = data['bestMatches'].map(match => {
 					return { symbol: match['1. symbol'], name: match['2. name'] };
 				});
+				this.loading = false;
 			})
-			.catch(err => console.error(err));
+			.catch(err => {
+				console.error(err)
+				this.loading = false;
+			});
 	}
 
 	onSelectSymbol(symbol: string) {
 		this.mxcdSymbolSelected.emit(symbol);
 	}
 
-	render() {
+	renderStock() {
+		return this.stocks.map((stock: Stock) => {
+			return <li onClick={this.onSelectSymbol.bind(this, stock.symbol)}>
+					<strong>{stock.symbol}</strong> - {stock.name}
+				</li>
+		});
+	}
 
+	render() {
+		let content = <ul> { this.renderStock() } </ul>;
+
+		if (this.loading) {
+			content = <mxcd-spinner></mxcd-spinner>
+		}
 		return (
 			<Host>
 				{/* 
@@ -63,13 +80,7 @@ export class StockFinder {
 					/>
 					<button type="submit">Fetch Stock</button>
 				</form>
-				<ul>
-					{this.stocks.map((stock: Stock) => {
-						return <li onClick={this.onSelectSymbol.bind(this, stock.symbol)}>
-									<strong>{stock.symbol}</strong> - {stock.name}
-								</li>
-					})}
-				</ul>
+				{content}
 
 			</Host>
 		)
