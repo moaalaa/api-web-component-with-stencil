@@ -23,6 +23,10 @@ export class StockFinder {
 	// Maybe some other components emit same event name.
 	// "EventEmitter" is a generic type Event so we can define our extra information with the type definitions
 	// and we can do this by using "<data here, and here>"
+	
+	/**
+	 * Fired When Symbol is selected
+	 */
 	@Event({ bubbles: true, composed: true }) mxcdSymbolSelected: EventEmitter<string>;
 
 	private findStocks(event: Event) {

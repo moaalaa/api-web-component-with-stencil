@@ -27,6 +27,9 @@ export class StockPrice {
 	@State() loading = false;
 	
 	
+	/**
+	 * Stock Symbol That will Search for
+	 */
 	@Prop({ reflect: true, mutable: true }) stockSymbol: string;
 
 	// Watch stockSymbol method 2 (best choice)

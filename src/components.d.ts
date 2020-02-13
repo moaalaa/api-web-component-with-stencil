@@ -13,6 +13,9 @@ export namespace Components {
   interface MxcdSpinner {}
   interface MxcdStockFinder {}
   interface MxcdStockPrice {
+    /**
+    * Stock Symbol That will Search for
+    */
     'stockSymbol': string;
   }
 }
@@ -47,9 +50,15 @@ declare global {
 declare namespace LocalJSX {
   interface MxcdSpinner {}
   interface MxcdStockFinder {
+    /**
+    * Fired When Symbol is selected
+    */
     'onMxcdSymbolSelected'?: (event: CustomEvent<string>) => void;
   }
   interface MxcdStockPrice {
+    /**
+    * Stock Symbol That will Search for
+    */
     'stockSymbol'?: string;
   }
 
